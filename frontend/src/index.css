@@ -381,6 +381,78 @@
   .account-save-btn {
     @apply flex-[2];
   }
+  /* ── Task list page ──────────────────────────────── */
+  .tasks-page {
+    @apply max-w-3xl mx-auto py-6;
+  }
+
+  .tasks-header {
+    @apply flex items-start justify-between mb-6;
+  }
+
+  .tasks-add-btn {
+    @apply w-auto px-5 no-underline shrink-0;
+  }
+
+  .tasks-empty {
+    @apply flex flex-col items-center justify-center py-20 text-center text-gray-400;
+  }
+
+  .tasks-empty-icon {
+    @apply text-4xl mb-3;
+  }
+
+  .tasks-empty-text {
+    @apply text-base font-semibold text-gray-500;
+  }
+
+  .tasks-empty-sub {
+    @apply text-sm mt-1;
+  }
+
+  .tasks-grid {
+    @apply flex flex-col gap-3;
+  }
+
+  .task-card {
+    @apply bg-surface-50 border border-surface-300 rounded-xl px-5 py-4
+           transition-all duration-150;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .task-card--cancelled {
+    @apply opacity-60;
+  }
+
+  .task-card-top {
+    @apply flex items-center justify-between gap-3 mb-1;
+  }
+
+  .task-card-title {
+    @apply text-sm font-semibold text-gray-800 leading-snug;
+  }
+
+  .task-card-desc {
+    @apply text-xs text-gray-500 mt-1 mb-3 leading-relaxed;
+  }
+
+  .task-card-actions {
+    @apply flex items-center gap-2 mt-3 pt-3 border-t border-surface-200;
+  }
+
+  .task-btn-cancel {
+    @apply px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150
+           border border-surface-300 text-gray-500
+           hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .task-btn-delete {
+    @apply px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150
+           border border-surface-300 text-gray-500
+           hover:border-red-300 hover:text-red-600 hover:bg-red-50
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
 
   /* ── Add task form ────────────────────────────────── */
   .task-textarea {

@@ -2,9 +2,9 @@ import { MOCK } from "./axiosConfig";
 import axiosInstance from "./axiosConfig";
 
 let mockTasks = [
-  { id: 1, title: "Buy groceries", description: "Milk, eggs, bread", status: "tracking" },
-  { id: 2, title: "Write report", description: "Q2 summary", status: "received" },
-  { id: 3, title: "Fix bug", description: "Login page crash", status: "return to sender" },
+  { id: 1, title: "Buy groceries", description: "Milk, eggs, bread", status: "tracking", completed: false },
+  { id: 2, title: "Write report", description: "Q2 summary", status: "received", completed: true },
+  { id: 3, title: "Fix bug", description: "Login page crash", status: "cancelled", completed: false },
 ];
 let nextId = 4;
 

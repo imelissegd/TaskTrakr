@@ -3,6 +3,7 @@ package com.tasktrakr.task.management.service.implementation;
 import com.tasktrakr.task.management.dto.request.UserRequestDTO;
 import com.tasktrakr.task.management.dto.request.UserUpdateDTO;
 import com.tasktrakr.task.management.dto.response.UserResponseDTO;
+import com.tasktrakr.task.management.exception.DuplicateUsernameException;
 import com.tasktrakr.task.management.exception.UserNotFoundException;
 import com.tasktrakr.task.management.model.User;
 import com.tasktrakr.task.management.repository.UserRepository;
@@ -23,6 +24,9 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public UserResponseDTO registerUser(UserRequestDTO userRequestDTO) {
+        if (userRepository.findByUsername(userRequestDTO.getUsername()).isPresent()) {
+            throw new DuplicateUsernameException(userRequestDTO.getUsername());
+        }
         User user = new User();
         user.setFirstname(userRequestDTO.getFirstname());
         user.setMiddlename(userRequestDTO.getMiddlename());

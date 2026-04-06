@@ -1,8 +1,10 @@
 package com.tasktrakr.task.management.service.implementation;
 
 import com.tasktrakr.task.management.dto.request.TaskRequestDTO;
+import com.tasktrakr.task.management.dto.request.TaskUpdateDTO;
 import com.tasktrakr.task.management.dto.response.TaskResponseDTO;
 import com.tasktrakr.task.management.exception.TaskNotFoundException;
+import com.tasktrakr.task.management.exception.UnauthorizedTaskAccessException;
 import com.tasktrakr.task.management.exception.UserNotFoundException;
 import com.tasktrakr.task.management.model.Task;
 import com.tasktrakr.task.management.model.User;
@@ -43,7 +45,7 @@ public class TaskServiceImplementation implements TaskService {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException(taskId));
         if (!task.getUser().getUserId().equals(userId)) {
-            throw new TaskNotFoundException(taskId);
+            throw new UnauthorizedTaskAccessException(taskId);
         }
         return mapToResponseDTO(task);
     }
@@ -62,15 +64,23 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
-    public TaskResponseDTO updateTask(Long taskId, TaskRequestDTO taskRequestDTO, Long userId) {
+    public TaskResponseDTO updateTask(Long taskId, TaskUpdateDTO taskUpdateDTO, Long userId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException(taskId));
         if (!task.getUser().getUserId().equals(userId)) {
-            throw new TaskNotFoundException(taskId);
+            throw new UnauthorizedTaskAccessException(taskId);
         }
-        task.setTitle(taskRequestDTO.getTitle());
-        task.setDescription(taskRequestDTO.getDescription());
-        task.setStatus(taskRequestDTO.getStatus() != null ? taskRequestDTO.getStatus() : task.getStatus());
+
+        if (taskUpdateDTO.getTitle() != null && !taskUpdateDTO.getTitle().isBlank()) {
+            task.setTitle(taskUpdateDTO.getTitle());
+        }
+        if (taskUpdateDTO.getDescription() != null) {
+            task.setDescription(taskUpdateDTO.getDescription());
+        }
+        if (taskUpdateDTO.getStatus() != null && !taskUpdateDTO.getStatus().isBlank()) {
+            task.setStatus(taskUpdateDTO.getStatus());
+        }
+
         Task updatedTask = taskRepository.save(task);
         return mapToResponseDTO(updatedTask);
     }
@@ -80,7 +90,7 @@ public class TaskServiceImplementation implements TaskService {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException(taskId));
         if (!task.getUser().getUserId().equals(userId)) {
-            throw new TaskNotFoundException(taskId);
+            throw new UnauthorizedTaskAccessException(taskId);
         }
         taskRepository.delete(task);
     }

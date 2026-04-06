@@ -19,7 +19,7 @@ public class UserUpdateDTO {
     @Size(max = 50, message = "Last name cannot exceed 50 characters")
     private String lastname;
 
-    @Size(max = 50, message = "Username cannot exceed 50 characters")
+    @Size(min = 3, max = 30, message = "Username must be between 3 and 30 characters")
     private String username;
 
     @Size(min = 8, message = "Password must be at least 8 characters")

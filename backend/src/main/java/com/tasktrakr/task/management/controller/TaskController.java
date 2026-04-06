@@ -1,6 +1,7 @@
 package com.tasktrakr.task.management.controller;
 
 import com.tasktrakr.task.management.dto.request.TaskRequestDTO;
+import com.tasktrakr.task.management.dto.request.TaskUpdateDTO;
 import com.tasktrakr.task.management.dto.response.TaskResponseDTO;
 import com.tasktrakr.task.management.model.User;
 import com.tasktrakr.task.management.service.TaskService;
@@ -38,8 +39,8 @@ public class TaskController {
 
     @PutMapping("/{taskId}")
     public ResponseEntity<TaskResponseDTO> updateTask(@PathVariable Long taskId,
-                                                      @Valid @RequestBody TaskRequestDTO taskRequestDTO) {
-        return ResponseEntity.ok(taskService.updateTask(taskId, taskRequestDTO, getAuthenticatedUserId()));
+                                                      @Valid @RequestBody TaskUpdateDTO taskUpdateDTO) {
+        return ResponseEntity.ok(taskService.updateTask(taskId, taskUpdateDTO, getAuthenticatedUserId()));
     }
 
     @DeleteMapping("/{taskId}")

@@ -3,6 +3,8 @@ package com.tasktrakr.task.management.service.implementation;
 import com.tasktrakr.task.management.config.JwtUtil;
 import com.tasktrakr.task.management.dto.request.LoginRequestDTO;
 import com.tasktrakr.task.management.dto.response.LoginResponseDTO;
+import com.tasktrakr.task.management.exception.AccountDeactivatedException;
+import com.tasktrakr.task.management.exception.UserNotFoundException;
 import com.tasktrakr.task.management.model.User;
 import com.tasktrakr.task.management.repository.UserRepository;
 import com.tasktrakr.task.management.service.AuthService;
@@ -28,9 +30,9 @@ public class AuthServiceImplementation implements AuthService {
                 )
         );
         User user = userRepository.findByUsername(loginRequestDTO.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(loginRequestDTO.getUsername()));
         if (!user.getActive()) {
-            throw new RuntimeException("User account is deactivated");
+            throw new AccountDeactivatedException();
         }
         String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
         return new LoginResponseDTO(token, user.getUsername());

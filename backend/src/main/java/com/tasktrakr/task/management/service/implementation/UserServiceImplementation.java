@@ -33,6 +33,7 @@ public class UserServiceImplementation implements UserService {
         user.setLastname(userRequestDTO.getLastname());
         user.setUsername(userRequestDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
+        user.setRole(userRequestDTO.getRole());
         user.setActive(true);
         User savedUser = userRepository.save(user);
         return mapToResponseDTO(savedUser);

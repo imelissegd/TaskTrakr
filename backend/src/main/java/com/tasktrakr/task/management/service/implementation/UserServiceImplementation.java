@@ -35,6 +35,7 @@ public class UserServiceImplementation implements UserService {
         user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
         user.setRole(userRequestDTO.getRole());
         user.setActive(true);
+        user.setEmail(userRequestDTO.getEmail());
         User savedUser = userRepository.save(user);
         return mapToResponseDTO(savedUser);
     }
@@ -65,6 +66,9 @@ public class UserServiceImplementation implements UserService {
         if (userUpdateDTO.getPassword() != null && !userUpdateDTO.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
         }
+        if (userUpdateDTO.getEmail() != null && !userUpdateDTO.getEmail().isEmpty()) {
+            user.setEmail(userUpdateDTO.getEmail());
+        }
         User updatedUser = userRepository.save(user);
         return mapToResponseDTO(updatedUser);
     }
@@ -86,6 +90,7 @@ public class UserServiceImplementation implements UserService {
         response.setUsername(user.getUsername());
         response.setActive(user.getActive());
         response.setRole(user.getRole());
+        response.setEmail(user.getEmail());
         return response;
     }
 }

@@ -43,6 +43,16 @@ public class TaskController {
         return ResponseEntity.ok(taskService.updateTask(taskId, taskUpdateDTO, getAuthenticatedUserId()));
     }
 
+    @PatchMapping("/{taskId}/cancel")
+    public ResponseEntity<TaskResponseDTO> cancelTask(@PathVariable Long taskId) {
+        return ResponseEntity.ok(taskService.cancelTask(taskId, getAuthenticatedUserId()));
+    }
+
+    @PatchMapping("/{taskId}/reactivate")
+    public ResponseEntity<TaskResponseDTO> reactivateTask(@PathVariable Long taskId) {
+        return ResponseEntity.ok(taskService.reactivateTask(taskId, getAuthenticatedUserId()));
+    }
+
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
         taskService.deleteTask(taskId, getAuthenticatedUserId());

@@ -1,2 +1,2 @@
 ALTER TABLE users
-    ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'user';
+    ADD COLUMN role ENUM('User', 'Admin') NOT NULL DEFAULT 'User';

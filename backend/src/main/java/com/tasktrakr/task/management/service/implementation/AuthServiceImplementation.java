@@ -34,7 +34,7 @@ public class AuthServiceImplementation implements AuthService {
         if (!user.getActive()) {
             throw new AccountDeactivatedException();
         }
-        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
+        String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
         return new LoginResponseDTO(token, user.getUsername());
     }
 }

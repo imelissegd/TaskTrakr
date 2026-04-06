@@ -70,6 +70,20 @@ public class GlobalExceptionHandler {
                 "You do not have permission to perform this action.", request);
     }
 
+    // 400 Bad Request
+
+    @ExceptionHandler(InvalidTaskStateException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidTaskState(
+            InvalidTaskStateException ex, HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvalidUserStateException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidUserState(
+            InvalidUserStateException ex, HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage(), request);
+    }
+
     // 400 Validation
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -89,8 +103,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Validation Failed")
                 .message("One or more fields are invalid.")
-                .path(request.getRequestURI())
-                .timestamp(LocalDateTime.now())
                 .validationErrors(fieldErrors)
                 .build();
 
@@ -116,8 +128,6 @@ public class GlobalExceptionHandler {
                 .status(status.value())
                 .error(error)
                 .message(message)
-                .path(request.getRequestURI())
-                .timestamp(LocalDateTime.now())
                 .build();
 
         return ResponseEntity.status(status).body(body);

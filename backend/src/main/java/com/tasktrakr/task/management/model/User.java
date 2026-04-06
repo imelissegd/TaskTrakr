@@ -1,5 +1,6 @@
 package com.tasktrakr.task.management.model;
 
+import com.tasktrakr.task.management.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,7 +43,11 @@ public class User {
     private Boolean active = true;
 
     @Column(name = "role", length = 20)
-    private String role = "user";
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.User;
+
+    @Column(name = "email", length = 50)
+    private String email;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

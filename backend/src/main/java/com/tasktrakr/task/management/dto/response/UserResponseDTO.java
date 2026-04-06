@@ -1,5 +1,6 @@
 package com.tasktrakr.task.management.dto.response;
 
+import com.tasktrakr.task.management.enums.Role;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -15,5 +16,6 @@ public class UserResponseDTO {
     private String lastname;
     private String username;
     private Boolean active;
-    private String role;
+    private Role role;
+    private String email;
 }

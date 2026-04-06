@@ -55,7 +55,7 @@ public class SecurityConfig {
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getUsername())
                     .password(user.getPassword())
-                    .authorities("ROLE_" + user.getRole())
+                    .authorities(user.getRole().name())
                     .build();
         };
     }
@@ -87,8 +87,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/users/register").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("admin")
+                        .requestMatchers("/api/admin/**").hasAuthority("Admin")
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui/index.html",

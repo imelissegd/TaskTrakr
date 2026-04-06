@@ -19,11 +19,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRequestDTO userRequestDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(userRequestDTO));
-    }
-
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> getMyDetails(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(userService.getUserById(user.getUserId()));

@@ -18,5 +18,9 @@ public interface TaskService {
 
     TaskResponseDTO updateTask(Long taskId, TaskUpdateDTO taskUpdateDTO, Long userId);
 
+    TaskResponseDTO cancelTask(Long taskId, Long userId);
+
+    TaskResponseDTO reactivateTask(Long taskId, Long userId);
+
     void deleteTask(Long taskId, Long userId);
 }

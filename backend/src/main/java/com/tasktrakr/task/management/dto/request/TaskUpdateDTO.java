@@ -1,5 +1,6 @@
 package com.tasktrakr.task.management.dto.request;
 
+import com.tasktrakr.task.management.enums.TaskStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -17,5 +18,5 @@ public class TaskUpdateDTO {
     @Size(max = 5000, message = "Description cannot exceed 5000 characters")
     private String description;
 
-    private String status;
+    private TaskStatus status;
 }

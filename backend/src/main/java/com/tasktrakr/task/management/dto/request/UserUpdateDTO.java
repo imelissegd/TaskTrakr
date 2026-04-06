@@ -1,5 +1,6 @@
 package com.tasktrakr.task.management.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,4 +25,7 @@ public class UserUpdateDTO {
 
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
+
+    @Size(max = 50, message = "Email cannot exceed 50 characters")
+    private String email;
 }

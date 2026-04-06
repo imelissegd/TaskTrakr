@@ -1,5 +1,6 @@
 package com.tasktrakr.task.management.model;
 
+import com.tasktrakr.task.management.enums.TaskStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +31,8 @@ public class Task {
     private String description;
 
     @Column(name = "status", length = 20)
-    private String status = "Pending";
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status = TaskStatus.Pending;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

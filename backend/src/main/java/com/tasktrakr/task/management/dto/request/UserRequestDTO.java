@@ -1,6 +1,8 @@
 package com.tasktrakr.task.management.dto.request;
 
+import com.tasktrakr.task.management.enums.Role;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,6 +32,10 @@ public class UserRequestDTO {
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
-    @NotBlank(message = "Role is required")
-    private String role;
+    @NotNull(message = "Role is required")
+    private Role role;
+
+    @NotBlank(message = "Email is required")
+    @Size(max = 50, message = "Email cannot exceed 50 characters")
+    private String email;
 }

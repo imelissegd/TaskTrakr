@@ -5,6 +5,7 @@ import com.tasktrakr.task.management.dto.response.AdminTaskResponseDTO;
 import com.tasktrakr.task.management.dto.response.TaskResponseDTO;
 import com.tasktrakr.task.management.dto.response.UserResponseDTO;
 import com.tasktrakr.task.management.exception.InvalidUserStateException;
+import com.tasktrakr.task.management.exception.LastAdminException;
 import com.tasktrakr.task.management.exception.TaskNotFoundException;
 import com.tasktrakr.task.management.exception.UserNotFoundException;
 import com.tasktrakr.task.management.model.Task;
@@ -28,18 +29,25 @@ public class AdminServiceImplementation implements AdminService {
     private final TaskRepository taskRepository;
 
     @Override
-    public List<UserResponseDTO> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(this::mapUserToResponseDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<AdminTaskResponseDTO> getAllTasks() {
         return taskRepository.findAll()
                 .stream()
                 .map(this::mapTaskToAdminResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public AdminTaskResponseDTO getTaskById(Long taskId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException(taskId));
+        return mapTaskToAdminResponseDTO(task);
+    }
+
+    @Override
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::mapUserToResponseDTO)
                 .collect(Collectors.toList());
     }
 
@@ -66,11 +74,34 @@ public class AdminServiceImplementation implements AdminService {
     }
 
     @Override
+    public UserResponseDTO updateUserRole(Long userId, Role role) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        if (user.getRole() == role) {
+            throw InvalidUserStateException.alreadyHasRole(role);
+        }
+        if (user.getRole() == Role.Admin && role == Role.User) {
+            long activeAdminCount = userRepository.countByRoleAndActive(Role.Admin, true);
+            if (activeAdminCount <= 1) {
+                throw new LastAdminException();
+            }
+        }
+        user.setRole(role);
+        return mapUserToResponseDTO(userRepository.save(user));
+    }
+
+    @Override
     public void deactivateUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         if (!user.getActive()) {
-            throw new InvalidUserStateException(false);
+            throw InvalidUserStateException.alreadyDeactivated();
+        }
+        if (user.getRole() == Role.Admin) {
+            long activeAdminCount = userRepository.countByRoleAndActive(Role.Admin, true);
+            if (activeAdminCount <= 1) {
+                throw new LastAdminException();
+            }
         }
         user.setActive(false);
         userRepository.save(user);
@@ -81,7 +112,7 @@ public class AdminServiceImplementation implements AdminService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         if (user.getActive()) {
-            throw new InvalidUserStateException(true);
+            throw InvalidUserStateException.alreadyActive();
         }
         user.setActive(true);
         userRepository.save(user);

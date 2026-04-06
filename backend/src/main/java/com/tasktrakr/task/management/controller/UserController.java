@@ -30,9 +30,4 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(user.getUserId(), userUpdateDTO));
     }
 
-    @PatchMapping("/me/deactivate")
-    public ResponseEntity<Void> deactivateMyAccount(@AuthenticationPrincipal User user) {
-        userService.deactivateUser(user.getUserId());
-        return ResponseEntity.noContent().build();
-    }
 }

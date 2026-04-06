@@ -40,6 +40,11 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), request);
     }
 
+    @ExceptionHandler(LastAdminException.class)
+    public ResponseEntity<ErrorResponseDTO> handleLastAdmin(
+            LastAdminException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), request);
+    }
     // 401 Unauthorized
 
     @ExceptionHandler(BadCredentialsException.class)

@@ -73,14 +73,6 @@ public class UserServiceImplementation implements UserService {
         return mapToResponseDTO(updatedUser);
     }
 
-    @Override
-    public void deactivateUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
-        user.setActive(false);
-        userRepository.save(user);
-    }
-
     private UserResponseDTO mapToResponseDTO(User user) {
         UserResponseDTO response = new UserResponseDTO();
         response.setUserId(user.getUserId());

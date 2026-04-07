@@ -68,7 +68,6 @@ export default function AccountDetailsPage() {
   const validate = () => {
     if (!form.firstname.trim()) return "First name is required.";
     if (!form.lastname.trim())  return "Last name is required.";
-    if (!form.username.trim())  return "Username is required.";
     if (!form.email.trim())     return "Email is required.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return "Enter a valid email.";
     if (changingPw) {
@@ -202,22 +201,8 @@ export default function AccountDetailsPage() {
                 <span className="account-info-icon">&#64;</span>
                 Username
               </span>
-              {editing ? (
-                <input
-                  name="username"
-                  type="text"
-                  value={form.username}
-                  onChange={handleChange}
-                  className={`account-inline-input${submitted && !form.username ? " input-error" : ""}`}
-                  autoComplete="username"
-                />
-              ) : (
                 <span className="account-info-value">{user?.username}</span>
-              )}
             </div>
-            {submitted && editing && !form.username && (
-              <p className="field-error account-field-error">Username is required.</p>
-            )}
 
             {/* Email */}
             <div className="account-info-row">

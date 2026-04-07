@@ -1,34 +1,47 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login } from "../../services/authService";
+import { login as loginService } from "../../services/authService";
 import { useAuth } from "../../App";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login: setAuth } = useAuth();
+  const { login } = useAuth();
 
-  const [form, setForm] = useState({ username: "", password: "" });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [form, setForm]           = useState({ username: "", password: "" });
+  const [error, setError]         = useState("");
+  const [loading, setLoading]     = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
   };
 
+  const validate = () => {
+    if (!form.username.trim()) return "Username is required.";
+    if (!form.password)        return "Password is required.";
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.username || !form.password) {
-      return setError("Please enter your username and password.");
-    }
+    setSubmitted(true);
+    const err = validate();
+    if (err) return setError(err);
 
     setLoading(true);
+    setError("");
     try {
-      const res = await login(form);
-      setAuth(res.user, res.token);
-      navigate(res.user.role === "ADMIN" ? "/admin/users" : "/tasks");
+      const { token, user } = await loginService(form);
+      login(user, token);
+      navigate(user.role === "Admin" ? "/admin/users" : "/tasks", { replace: true });
     } catch (err) {
-      setError("Login failed. Please check your credentials.");
+      const status = err?.response?.status;
+      if (status === 401 || status === 403) {
+        setError("Invalid username or password.");
+      } else {
+        setError("Login failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -65,9 +78,14 @@ export default function LoginPage() {
                 value={form.username}
                 onChange={handleChange}
                 placeholder="your_username"
+                className={submitted && !form.username.trim() ? "input-error" : ""}
                 autoComplete="username"
+                autoFocus
               />
             </div>
+            {submitted && !form.username.trim() && (
+              <p className="field-error">Username is required.</p>
+            )}
           </div>
 
           <div className="field-group">
@@ -81,9 +99,13 @@ export default function LoginPage() {
                 value={form.password}
                 onChange={handleChange}
                 placeholder="••••••••"
+                className={submitted && !form.password ? "input-error" : ""}
                 autoComplete="current-password"
               />
             </div>
+            {submitted && !form.password && (
+              <p className="field-error">Password is required.</p>
+            )}
           </div>
 
           <button

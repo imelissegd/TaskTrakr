@@ -178,7 +178,7 @@
 
   .role-btn-user-active {
     @apply w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200
-           bg-green-50 border-2 border-brand-500 text-brand-700;
+           bg-orange-50 border-2 border-orange-200 text-orange-500;
   }
 
   .role-btn-admin-active {
@@ -332,8 +332,8 @@
   }
 
   .account-role-badge--user {
-    @apply text-xs font-semibold px-2.5 py-1 rounded-full mb-5
-          bg-green-50 text-brand-700 border border-brand-200;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+          bg-orange-50 text-orange-500 border border-orange-200;
   }
 
   .account-role-badge--admin {
@@ -473,6 +473,14 @@
 
   .task-action-btn--delete {
     @apply hover:border-red-300 hover:text-red-500 hover:bg-red-50;
+  }
+
+  .task-action-btn--promote {
+    @apply hover:border-purple-300 hover:text-purple-600 hover:bg-purple-50;
+  }
+
+  .task-action-btn--demote {
+    @apply hover:border-orange-300 hover:text-orange-600 hover:bg-orange-50;
   }
 
   /* Base icon button */
@@ -655,6 +663,10 @@
            transition-all duration-150 no-underline whitespace-nowrap;
   }
 
+  .admin-col-header {
+    @apply text-xs font-semibold uppercase tracking-wider text-gray-400;
+  }
+
   /* ── Admin role / status badges ──────────────────── */
   .badge-admin-role {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
@@ -663,7 +675,7 @@
 
   .badge-user-role {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
-           bg-green-50 text-brand-700 border border-brand-200;
+           bg-orange-50 text-orange-500 border border-orange-200;
   }
 
   .badge-active {

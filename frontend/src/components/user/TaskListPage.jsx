@@ -129,6 +129,9 @@ export default function TaskListPage() {
                 )}
 
                 <div className="task-card-actions">
+                  <Link to={`/tasks/${task.taskId}`} className="task-btn-edit">
+                    View
+                  </Link>
                   <Link to={`/tasks/edit/${task.taskId}`} className="task-btn-edit">
                     Edit
                   </Link>

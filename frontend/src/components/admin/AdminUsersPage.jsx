@@ -58,8 +58,9 @@ export default function AdminUsersPage() {
       setUsers((prev) =>
         prev.map((x) => (x.userId === u.userId ? { ...x, active: !x.active } : x))
       );
-    } catch {
-      setError("Failed to update account status.");
+    } catch (err) {
+      const message = err?.response?.data?.message || "Failed to update account status.";
+          setError(message);
     } finally {
       setActionId(null);
     }

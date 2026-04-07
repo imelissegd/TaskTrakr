@@ -109,8 +109,9 @@ export default function AdminUserDetailPage() {
       const refreshed = await adminGetUserById(userId);
       setUser(refreshed);
       setSuccess("User deactivated.");
-    } catch {
-      setError("Failed to deactivate user.");
+    } catch (err) {
+      const message = err?.response?.data?.message || "Failed to deactivate user.";
+          setError(message);
     } finally {
       setActioning(false);
     }

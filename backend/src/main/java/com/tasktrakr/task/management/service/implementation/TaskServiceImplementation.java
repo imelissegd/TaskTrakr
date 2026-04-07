@@ -88,6 +88,23 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
+    public TaskResponseDTO completeTask(Long taskId, Long userId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException(taskId));
+        if (!task.getUser().getUserId().equals(userId)) {
+            throw new UnauthorizedTaskAccessException(taskId);
+        }
+        if (task.getStatus() == TaskStatus.Completed) {
+            throw InvalidTaskStateException.alreadyCompleted();
+        }
+        if (task.getStatus() == TaskStatus.Cancelled) {
+            throw InvalidTaskStateException.cannotCompleteCancelled();
+        }
+        task.setStatus(TaskStatus.Completed);
+        return mapToResponseDTO(taskRepository.save(task));
+    }
+
+    @Override
     public TaskResponseDTO cancelTask(Long taskId, Long userId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException(taskId));
@@ -106,7 +123,7 @@ public class TaskServiceImplementation implements TaskService {
             throw new UnauthorizedTaskAccessException(taskId);
         }
         if (task.getStatus() != TaskStatus.Cancelled) {
-            throw new InvalidTaskStateException();
+            throw InvalidTaskStateException.notCancelled();
         }
         task.setStatus(TaskStatus.Pending);
         return mapToResponseDTO(taskRepository.save(task));

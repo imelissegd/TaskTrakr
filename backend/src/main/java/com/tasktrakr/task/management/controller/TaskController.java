@@ -43,6 +43,11 @@ public class TaskController {
         return ResponseEntity.ok(taskService.updateTask(taskId, taskUpdateDTO, getAuthenticatedUserId()));
     }
 
+    @PatchMapping("/{taskId}/complete")
+    public ResponseEntity<TaskResponseDTO> completeTask(@PathVariable Long taskId) {
+        return ResponseEntity.ok(taskService.completeTask(taskId, getAuthenticatedUserId()));
+    }
+
     @PatchMapping("/{taskId}/cancel")
     public ResponseEntity<TaskResponseDTO> cancelTask(@PathVariable Long taskId) {
         return ResponseEntity.ok(taskService.cancelTask(taskId, getAuthenticatedUserId()));

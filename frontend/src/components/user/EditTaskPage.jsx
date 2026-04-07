@@ -3,38 +3,41 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { getTaskById, updateTask } from "../../services/taskService";
 
 const STATUSES = [
-  { value: "tracking",  label: "Tracking" },
-  { value: "received",  label: "Received" },
-  { value: "cancelled", label: "Cancelled" },
+  { value: "Pending",   label: "Pending" },
+  { value: "Completed", label: "Completed" },
+  { value: "Cancelled", label: "Cancelled" },
 ];
 
 export default function EditTaskPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ title: "", description: "", status: "tracking", completed: false });
+  const [form, setForm]           = useState({ title: "", description: "", status: "Pending" });
   const [loading, setLoading]     = useState(true);
   const [saving, setSaving]       = useState(false);
   const [error, setError]         = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    const fetch = async () => {
+    const load = async () => {
       try {
         const task = await getTaskById(id);
-        setForm({ title: task.title, description: task.description || "", status: task.status, completed: task.completed ?? false });
+        setForm({
+          title:       task.title,
+          description: task.description || "",
+          status:      task.status,
+        });
       } catch {
         setError("Task not found.");
       } finally {
         setLoading(false);
       }
     };
-    fetch();
+    load();
   }, [id]);
 
   const handleChange = (e) => {
-    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
-    setForm({ ...form, [e.target.name]: value });
+    setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
   };
 
@@ -139,23 +142,9 @@ export default function EditTaskPage() {
             </div>
           </div>
 
-          {/* Completed */}
-          <div className="field-group">
-            <label className="task-checkbox-label">
-              <input
-                type="checkbox"
-                name="completed"
-                checked={form.completed}
-                onChange={handleChange}
-                className="task-checkbox"
-              />
-              Mark as completed
-            </label>
-          </div>
-
           {/* Actions */}
           <div className="addtask-actions">
-            <Link to="/tasks" className="addtask-cancel">
+            <Link to="/tasks" className="btn-secondary addtask-cancel">
               Cancel
             </Link>
             <button type="submit" disabled={saving} className="btn-primary addtask-submit">

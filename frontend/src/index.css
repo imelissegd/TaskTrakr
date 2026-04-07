@@ -178,7 +178,7 @@
 
   .role-btn-user-active {
     @apply w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200
-           bg-green-50 border-2 border-brand-500 text-brand-700;
+           bg-orange-50 border-2 border-orange-200 text-orange-500;
   }
 
   .role-btn-admin-active {
@@ -332,8 +332,8 @@
   }
 
   .account-role-badge--user {
-    @apply text-xs font-semibold px-2.5 py-1 rounded-full mb-5
-          bg-green-50 text-brand-700 border border-brand-200;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+          bg-orange-50 text-orange-500 border border-orange-200;
   }
 
   .account-role-badge--admin {
@@ -416,7 +416,7 @@
 
   .task-card {
     @apply bg-surface-50 border border-surface-300 rounded-xl px-5 py-4
-           transition-all duration-150;
+           transition-all duration-150 flex flex-col gap-3;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
 
@@ -425,33 +425,109 @@
   }
 
   .task-card-top {
-    @apply flex items-center justify-between gap-3 mb-1;
+    @apply flex items-center gap-2;
   }
 
   .task-card-title {
     @apply text-sm font-semibold text-gray-800 leading-snug;
   }
 
+  .task-card-title--done {
+    @apply line-through text-gray-400;
+  }
+
   .task-card-desc {
-    @apply text-xs text-gray-500 mt-1 mb-3 leading-relaxed;
+    @apply text-xs text-gray-500 leading-relaxed;
   }
 
   .task-card-actions {
-    @apply flex items-center gap-2 mt-3 pt-3 border-t border-surface-200;
+    @apply flex items-center gap-2 pt-3 border-t border-surface-200 flex-wrap;
   }
 
-  .task-btn-cancel {
-    @apply px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150
-           border border-surface-300 text-gray-500
-           hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50
-           disabled:opacity-40 disabled:cursor-not-allowed;
+  .task-action-btn {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+           border border-surface-200 text-gray-500 bg-transparent
+           transition-all duration-150
+           disabled:opacity-30 disabled:cursor-not-allowed;
   }
 
-  .task-btn-delete {
-    @apply px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150
-           border border-surface-300 text-gray-500
-           hover:border-red-300 hover:text-red-600 hover:bg-red-50
-           disabled:opacity-40 disabled:cursor-not-allowed;
+  .task-action-btn svg {
+    @apply w-3.5 h-3.5 shrink-0;
+  }
+
+  .task-action-btn--view {
+    @apply hover:border-accent-300 hover:text-accent-600 hover:bg-accent-50;
+  }
+
+  .task-action-btn--edit {
+    @apply hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50;
+  }
+
+  .task-action-btn--complete {
+    @apply hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50;
+  }
+
+  .task-action-btn--cancel {
+    @apply hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50;
+  }
+
+  .task-action-btn--delete {
+    @apply hover:border-red-300 hover:text-red-500 hover:bg-red-50;
+  }
+
+  .task-action-btn--promote {
+    @apply hover:border-purple-300 hover:text-purple-600 hover:bg-purple-50;
+  }
+
+  .task-action-btn--demote {
+    @apply hover:border-orange-300 hover:text-orange-600 hover:bg-orange-50;
+  }
+
+  /* Base icon button */
+  .task-icon-btn {
+    @apply w-8 h-8 flex items-center justify-center rounded-lg text-sm
+           border border-surface-200 text-gray-400 bg-transparent
+           transition-all duration-150 relative
+           disabled:opacity-30 disabled:cursor-not-allowed;
+  }
+
+  /* Tooltip */
+  .task-icon-btn::after {
+    content: attr(data-tip);
+    @apply absolute right-10 top-1/2 -translate-y-1/2
+           bg-gray-800 text-white text-xs font-medium
+           px-2 py-1 rounded-md whitespace-nowrap
+           opacity-0 pointer-events-none transition-opacity duration-150;
+    z-index: 10;
+  }
+
+  .task-icon-btn:hover::after {
+    @apply opacity-100;
+  }
+
+  /* View — blue */
+  .task-icon-btn--view {
+    @apply hover:border-accent-300 hover:text-accent-600 hover:bg-accent-50;
+  }
+
+  /* Edit — indigo */
+  .task-icon-btn--edit {
+    @apply hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50;
+  }
+
+  /* Complete / Pending — green */
+  .task-icon-btn--complete {
+    @apply hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50;
+  }
+
+  /* Cancel / Restore — amber */
+  .task-icon-btn--cancel {
+    @apply hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50;
+  }
+
+  /* Delete — red */
+  .task-icon-btn--delete {
+    @apply hover:border-red-300 hover:text-red-500 hover:bg-red-50;
   }
 
   /* ── Add task form ────────────────────────────────── */
@@ -481,7 +557,7 @@
   .addtask-submit {
     @apply flex-[2];
   }
-  
+
   /* ── Confirm modal ───────────────────────────────── */
   .modal-backdrop {
     @apply fixed inset-0 z-50 flex items-center justify-center px-4;
@@ -587,6 +663,10 @@
            transition-all duration-150 no-underline whitespace-nowrap;
   }
 
+  .admin-col-header {
+    @apply text-xs font-semibold uppercase tracking-wider text-gray-400;
+  }
+
   /* ── Admin role / status badges ──────────────────── */
   .badge-admin-role {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
@@ -595,7 +675,7 @@
 
   .badge-user-role {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
-           bg-green-50 text-brand-700 border border-brand-200;
+           bg-orange-50 text-orange-500 border border-orange-200;
   }
 
   .badge-active {
@@ -671,34 +751,5 @@
 
   .account-pw-fields {
     @apply px-4 pb-4 pt-2 bg-surface-50 border-t border-surface-200;
-  }
-
-  /* ── Task action buttons (list page) ─────────────── */
-  .task-btn-edit {
-    @apply px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150
-           border border-surface-300 text-gray-500 no-underline
-           hover:border-accent-300 hover:text-accent-600 hover:bg-accent-50;
-  }
-
-  .task-btn-complete {
-    @apply px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150
-           border border-surface-300 text-gray-500
-           hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50
-           disabled:opacity-40 disabled:cursor-not-allowed;
-  }
-
-  .task-btn-undo {
-    @apply px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150
-           border border-surface-300 text-gray-500
-           hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50
-           disabled:opacity-40 disabled:cursor-not-allowed;
-  }
-
-  .task-card-title--done {
-    @apply line-through text-gray-400;
-  }
-
-  .task-card--completed {
-    @apply opacity-75;
   }
 }

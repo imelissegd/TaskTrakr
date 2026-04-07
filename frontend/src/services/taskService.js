@@ -2,9 +2,9 @@ import { MOCK } from "./axiosConfig";
 import axiosInstance from "./axiosConfig";
 
 let mockTasks = [
-  { id: 1, title: "Buy groceries", description: "Milk, eggs, bread", status: "tracking", completed: false },
-  { id: 2, title: "Write report", description: "Q2 summary", status: "received", completed: true },
-  { id: 3, title: "Fix bug", description: "Login page crash", status: "cancelled", completed: false },
+  { taskId: 1, title: "Buy groceries", description: "Milk, eggs, bread", status: "Pending" },
+  { taskId: 2, title: "Write report",  description: "Q2 summary",        status: "Completed" },
+  { taskId: 3, title: "Fix bug",       description: "Login page crash",   status: "Cancelled" },
 ];
 let nextId = 4;
 
@@ -16,7 +16,7 @@ export const getTasks = async () => {
 
 export const getTaskById = async (id) => {
   if (MOCK) {
-    const task = mockTasks.find((t) => t.id === Number(id));
+    const task = mockTasks.find((t) => t.taskId === Number(id));
     if (!task) throw { response: { status: 404 } };
     return task;
   }
@@ -26,7 +26,7 @@ export const getTaskById = async (id) => {
 
 export const createTask = async (data) => {
   if (MOCK) {
-    const task = { id: nextId++, ...data };
+    const task = { taskId: nextId++, ...data };
     mockTasks.push(task);
     return task;
   }
@@ -36,8 +36,8 @@ export const createTask = async (data) => {
 
 export const updateTask = async (id, data) => {
   if (MOCK) {
-    mockTasks = mockTasks.map((t) => (t.id === Number(id) ? { ...t, ...data } : t));
-    return mockTasks.find((t) => t.id === Number(id));
+    mockTasks = mockTasks.map((t) => (t.taskId === Number(id) ? { ...t, ...data } : t));
+    return mockTasks.find((t) => t.taskId === Number(id));
   }
   const res = await axiosInstance.put(`/api/tasks/${id}`, data);
   return res.data;
@@ -45,9 +45,9 @@ export const updateTask = async (id, data) => {
 
 export const deleteTask = async (id) => {
   if (MOCK) {
-    const exists = mockTasks.find((t) => t.id === Number(id));
+    const exists = mockTasks.find((t) => t.taskId === Number(id));
     if (!exists) throw { response: { status: 404 } };
-    mockTasks = mockTasks.filter((t) => t.id !== Number(id));
+    mockTasks = mockTasks.filter((t) => t.taskId !== Number(id));
     return;
   }
   await axiosInstance.delete(`/api/tasks/${id}`);

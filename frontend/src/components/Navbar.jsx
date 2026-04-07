@@ -5,10 +5,7 @@ const NavLink = ({ to, children }) => {
   const { pathname } = useLocation();
   const active = pathname === to || pathname.startsWith(to + "/");
   return (
-    <Link
-      to={to}
-      className={`nav-link ${active ? "nav-link--active" : ""}`}
-    >
+    <Link to={to} className={`nav-link ${active ? "nav-link--active" : ""}`}>
       {children}
     </Link>
   );
@@ -26,7 +23,6 @@ export default function Navbar() {
   return (
     <nav className="navbar">
 
-      {/* Brand */}
       <Link to="/" className="navbar-brand">
         <span className="navbar-logo">
           <span className="navbar-logo-green">Task</span>
@@ -35,12 +31,10 @@ export default function Navbar() {
         <span className="navbar-tagline">Task Management System</span>
       </Link>
 
-      {/* Links — only when logged in */}
       {user && (
         <div className="navbar-links">
 
-          {/* User links */}
-          {user.role === "USER" && (
+          {user.role === "User" && (
             <>
               <NavLink to="/tasks">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -61,8 +55,7 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Admin links */}
-          {user.role === "ADMIN" && (
+          {user.role === "Admin" && (
             <>
               <NavLink to="/admin/users">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -85,7 +78,6 @@ export default function Navbar() {
             </>
           )}
 
-          {/* User info + logout */}
           <div className="navbar-user">
             <span className="navbar-user-info">
               <span className="navbar-username">{user.username}</span>
@@ -99,7 +91,6 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Guest links — logged out */}
       {!user && (
         <div className="navbar-links">
           <Link to="/login" className="nav-link">Login</Link>

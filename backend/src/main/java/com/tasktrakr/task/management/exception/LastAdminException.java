@@ -1,7 +1,9 @@
 package com.tasktrakr.task.management.exception;
 
+import com.tasktrakr.task.management.util.MessageUtil;
+
 public class LastAdminException extends RuntimeException {
     public LastAdminException() {
-        super("Cannot deactivate the last active admin account. Promote another user to Admin first.");
+        super(MessageUtil.get("exception.admin.last.admin"));
     }
 }

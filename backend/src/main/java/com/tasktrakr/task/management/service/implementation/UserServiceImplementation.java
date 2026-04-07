@@ -60,9 +60,6 @@ public class UserServiceImplementation implements UserService {
         if (userUpdateDTO.getLastname() != null && !userUpdateDTO.getLastname().isEmpty()) {
             user.setLastname(userUpdateDTO.getLastname());
         }
-        if (userUpdateDTO.getUsername() != null && !userUpdateDTO.getUsername().isEmpty()) {
-            user.setUsername(userUpdateDTO.getUsername());
-        }
         if (userUpdateDTO.getPassword() != null && !userUpdateDTO.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
         }

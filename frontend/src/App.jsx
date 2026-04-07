@@ -64,7 +64,12 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter 
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Navbar />
         <div className="max-w-5xl mx-auto px-4 py-8">
           <Routes>

@@ -3,22 +3,21 @@ import { useNavigate, Link } from "react-router-dom";
 import { createTask } from "../../services/taskService";
 
 const STATUSES = [
-  { value: "tracking",  label: "Tracking" },
-  { value: "received",  label: "Received" },
-  { value: "cancelled", label: "Cancelled" },
+  { value: "Pending",   label: "Pending" },
+  { value: "Completed", label: "Completed" },
+  { value: "Cancelled", label: "Cancelled" },
 ];
 
 export default function AddTaskPage() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ title: "", description: "", status: "tracking", completed: false });
-  const [error, setError]       = useState("");
-  const [loading, setLoading]   = useState(false);
+  const [form, setForm]           = useState({ title: "", description: "", status: "Pending" });
+  const [error, setError]         = useState("");
+  const [loading, setLoading]     = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
-    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
-    setForm({ ...form, [e.target.name]: value });
+    setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
   };
 
@@ -48,7 +47,6 @@ export default function AddTaskPage() {
     <div className="auth-page">
       <div className="auth-card auth-card--wide">
 
-        {/* Heading */}
         <div className="auth-brand">
           <h1 className="page-header" style={{ marginBottom: 0 }}>Add Task</h1>
           <p className="page-subheader" style={{ marginBottom: 0 }}>Fill in the details below</p>
@@ -114,20 +112,6 @@ export default function AddTaskPage() {
                 ))}
               </select>
             </div>
-          </div>
-
-          {/* Completed */}
-          <div className="field-group">
-            <label className="task-checkbox-label">
-              <input
-                type="checkbox"
-                name="completed"
-                checked={form.completed}
-                onChange={handleChange}
-                className="task-checkbox"
-              />
-              Mark as completed
-            </label>
           </div>
 
           {/* Actions */}

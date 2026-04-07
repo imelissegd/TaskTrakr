@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { getTasks, deleteTask, updateTask } from "../../services/taskService";
 
 const STATUS_META = {
-  tracking:  { label: "Tracking",  css: "badge-tracking" },
-  received:  { label: "Received",  css: "badge-received" },
-  cancelled: { label: "Cancelled", css: "badge-cancelled" },
+  Pending:   { label: "Pending",   css: "badge-tracking" },
+  Completed: { label: "Completed", css: "badge-received" },
+  Cancelled: { label: "Cancelled", css: "badge-cancelled" },
 };
 
 function ConfirmModal({ task, onConfirm, onCancel }) {
@@ -47,10 +47,11 @@ export default function TaskListPage() {
   };
 
   const handleToggleComplete = async (task) => {
-    setActionId(task.id);
+    setActionId(task.taskId);
+    const newStatus = task.status === "Completed" ? "Pending" : "Completed";
     try {
-      const updated = await updateTask(task.id, { ...task, completed: !task.completed });
-      setTasks((prev) => prev.map((t) => (t.id === task.id ? updated : t)));
+      const updated = await updateTask(task.taskId, { ...task, status: newStatus });
+      setTasks((prev) => prev.map((t) => (t.taskId === task.taskId ? updated : t)));
     } catch {
       setError("Failed to update task.");
     } finally {
@@ -61,10 +62,10 @@ export default function TaskListPage() {
   const handleDeleteConfirm = async () => {
     const task = toDelete;
     setToDelete(null);
-    setActionId(task.id);
+    setActionId(task.taskId);
     try {
-      await deleteTask(task.id);
-      setTasks((prev) => prev.filter((t) => t.id !== task.id));
+      await deleteTask(task.taskId);
+      setTasks((prev) => prev.filter((t) => t.taskId !== task.taskId));
     } catch {
       setError("Failed to delete task.");
     } finally {
@@ -105,18 +106,21 @@ export default function TaskListPage() {
       {!loading && tasks.length > 0 && (
         <div className="tasks-grid">
           {tasks.map((task) => {
-            const meta = STATUS_META[task.status] ?? STATUS_META["tracking"];
-            const busy = actionId === task.id;
+            const meta = STATUS_META[task.status] ?? STATUS_META["Pending"];
+            const busy = actionId === task.taskId;
+            const isDone = task.status === "Completed";
+            const isCancelled = task.status === "Cancelled";
             return (
-              <div key={task.id} className={`task-card${task.completed ? " task-card--completed" : ""}`}>
-
+              <div
+                key={task.taskId}
+                className={`task-card${isCancelled ? " task-card--cancelled" : ""}`}
+              >
                 <div className="task-card-top">
-                  <h3 className={`task-card-title${task.completed ? " task-card-title--done" : ""}`}>
+                  <h3 className={`task-card-title${isDone ? " task-card-title--done" : ""}`}>
                     {task.title}
                   </h3>
                   <div className="task-card-badges">
                     <span className={meta.css}>{meta.label}</span>
-                    {task.completed && <span className="badge-completed">✓ Done</span>}
                   </div>
                 </div>
 
@@ -125,15 +129,15 @@ export default function TaskListPage() {
                 )}
 
                 <div className="task-card-actions">
-                  <Link to={`/tasks/edit/${task.id}`} className="task-btn-edit">
+                  <Link to={`/tasks/edit/${task.taskId}`} className="task-btn-edit">
                     Edit
                   </Link>
                   <button
-                    className={task.completed ? "task-btn-undo" : "task-btn-complete"}
-                    disabled={busy}
+                    className={isDone ? "task-btn-undo" : "task-btn-complete"}
+                    disabled={busy || isCancelled}
                     onClick={() => handleToggleComplete(task)}
                   >
-                    {busy ? "…" : task.completed ? "Mark Pending" : "Mark Complete"}
+                    {busy ? "…" : isDone ? "Mark Pending" : "Mark Complete"}
                   </button>
                   <button
                     className="task-btn-delete"

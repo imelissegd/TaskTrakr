@@ -12,7 +12,7 @@ export default function EditTaskPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [form, setForm]           = useState({ title: "", description: "", status: "Pending" });
+  const [form, setForm]           = useState({ title: "", description: "", status: "Pending", deadline: "" });
   const [loading, setLoading]     = useState(true);
   const [saving, setSaving]       = useState(false);
   const [error, setError]         = useState("");
@@ -23,9 +23,10 @@ export default function EditTaskPage() {
       try {
         const task = await getTaskById(id);
         setForm({
-          title:       task.title,
+          title: task.title,
           description: task.description || "",
-          status:      task.status,
+          status: task.status,
+          deadline: task.deadline ? task.deadline.slice(0, 16) : ""
         });
       } catch {
         setError("Task not found.");
@@ -54,7 +55,10 @@ export default function EditTaskPage() {
 
     setSaving(true);
     try {
-      await updateTask(id, form);
+      await updateTask(id, {
+        ...form,
+        deadline: form.deadline || null
+      });
       navigate("/tasks");
     } catch {
       setError("Failed to save changes. Please try again.");
@@ -121,6 +125,23 @@ export default function EditTaskPage() {
               rows={3}
               className="task-textarea"
             />
+          </div>
+
+          {/* Deadline */}
+          <div className="field-group">
+            <label htmlFor="deadline">Deadline</label>
+            <div className="input-wrap">
+              <span className="input-icon">&#128197;</span>
+              <input
+                id="deadline"
+                name="deadline"
+                type="datetime-local"
+                value={form.deadline}
+                onChange={handleChange}
+                min={new Date().toISOString().slice(0, 16)} // prevent past dates
+                className=""
+              />
+            </div>
           </div>
 
           {/* Status */}

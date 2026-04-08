@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,6 +19,8 @@ public class TaskUpdateDTO {
 
     @Size(max = 5000, message = "Description cannot exceed 5000 characters")
     private String description;
+
+    private LocalDateTime deadline;
 
     private TaskStatus status;
 }

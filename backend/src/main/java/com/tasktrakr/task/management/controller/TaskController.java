@@ -1,17 +1,22 @@
 package com.tasktrakr.task.management.controller;
 
 import com.tasktrakr.task.management.dto.request.TaskRequestDTO;
+import com.tasktrakr.task.management.dto.request.TaskSearchDTO;
 import com.tasktrakr.task.management.dto.request.TaskUpdateDTO;
+import com.tasktrakr.task.management.dto.response.FilterResponseDTO;
 import com.tasktrakr.task.management.dto.response.TaskResponseDTO;
+import com.tasktrakr.task.management.enums.TaskStatus;
 import com.tasktrakr.task.management.model.User;
 import com.tasktrakr.task.management.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -21,14 +26,34 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    @GetMapping
-    public ResponseEntity<List<TaskResponseDTO>> getMyTasks() {
-        return ResponseEntity.ok(taskService.getTasksByUserId(getAuthenticatedUserId()));
-    }
-
     @GetMapping("/{taskId}")
     public ResponseEntity<TaskResponseDTO> getTaskById(@PathVariable Long taskId) {
         return ResponseEntity.ok(taskService.getTaskById(taskId, getAuthenticatedUserId()));
+    }
+
+    @GetMapping
+    public ResponseEntity<FilterResponseDTO<TaskResponseDTO>> getMyTasks(
+            @AuthenticationPrincipal User user,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) LocalDateTime deadlineFrom,
+            @RequestParam(required = false) LocalDateTime deadlineTo,
+            @RequestParam(required = false) TaskStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+
+        TaskSearchDTO searchDTO = new TaskSearchDTO();
+        searchDTO.setTitle(title);
+        searchDTO.setDeadlineFrom(deadlineFrom);
+        searchDTO.setDeadlineTo(deadlineTo);
+        searchDTO.setStatus(status);
+        searchDTO.setPage(page);
+        searchDTO.setSize(size);
+        searchDTO.setSortBy(sortBy);
+        searchDTO.setSortDir(sortDir);
+
+        return ResponseEntity.ok(taskService.searchTasks(searchDTO, user.getUserId()));
     }
 
     @PostMapping

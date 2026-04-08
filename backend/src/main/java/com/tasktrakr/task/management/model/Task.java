@@ -34,6 +34,9 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private TaskStatus status = TaskStatus.Pending;
 
+    @Column(name = "deadline")
+    private LocalDateTime deadline;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

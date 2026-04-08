@@ -1,8 +1,10 @@
 package com.tasktrakr.task.management.service;
 
+import com.tasktrakr.task.management.dto.request.TaskSearchDTO;
+import com.tasktrakr.task.management.dto.request.UserSearchDTO;
 import com.tasktrakr.task.management.dto.request.UserUpdateDTO;
 import com.tasktrakr.task.management.dto.response.AdminTaskResponseDTO;
-import com.tasktrakr.task.management.dto.response.TaskResponseDTO;
+import com.tasktrakr.task.management.dto.response.FilterResponseDTO;
 import com.tasktrakr.task.management.dto.response.UserResponseDTO;
 import com.tasktrakr.task.management.enums.Role;
 
@@ -10,13 +12,17 @@ import java.util.List;
 
 public interface AdminService {
 
-    List<AdminTaskResponseDTO> getAllTasks();
+//    List<AdminTaskResponseDTO> getAllTasks();
 
     AdminTaskResponseDTO getTaskById(Long taskId);
 
-    List<UserResponseDTO> getAllUsers();
+//    List<UserResponseDTO> getAllUsers();
 
     UserResponseDTO getUserById(Long userId);
+
+    FilterResponseDTO<UserResponseDTO> searchUsers(UserSearchDTO searchDTO);
+
+    FilterResponseDTO<AdminTaskResponseDTO> searchAllTasks(TaskSearchDTO searchDTO, Long userId);
 
     UserResponseDTO updateUser(Long userId, UserUpdateDTO userUpdateDTO);
 

@@ -33,13 +33,6 @@ public class AdminServiceImplementation implements AdminService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
 
-//    @Override
-//    public List<AdminTaskResponseDTO> getAllTasks() {
-//        return taskRepository.findAll()
-//                .stream()
-//                .map(this::mapTaskToAdminResponseDTO)
-//                .collect(Collectors.toList());
-//    }
 
     @Override
     public AdminTaskResponseDTO getTaskById(Long taskId) {
@@ -47,14 +40,6 @@ public class AdminServiceImplementation implements AdminService {
                 .orElseThrow(() -> new TaskNotFoundException(taskId));
         return mapTaskToAdminResponseDTO(task);
     }
-
-//    @Override
-//    public List<UserResponseDTO> getAllUsers() {
-//        return userRepository.findAll()
-//                .stream()
-//                .map(this::mapUserToResponseDTO)
-//                .collect(Collectors.toList());
-//    }
 
     @Override
     public UserResponseDTO getUserById(Long userId) {

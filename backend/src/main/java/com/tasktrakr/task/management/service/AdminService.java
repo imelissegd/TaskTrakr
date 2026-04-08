@@ -12,11 +12,7 @@ import java.util.List;
 
 public interface AdminService {
 
-//    List<AdminTaskResponseDTO> getAllTasks();
-
     AdminTaskResponseDTO getTaskById(Long taskId);
-
-//    List<UserResponseDTO> getAllUsers();
 
     UserResponseDTO getUserById(Long userId);
 

@@ -1,8 +1,10 @@
 package com.tasktrakr.task.management.service.implementation;
 
+import com.tasktrakr.task.management.dto.request.TaskSearchDTO;
+import com.tasktrakr.task.management.dto.request.UserSearchDTO;
 import com.tasktrakr.task.management.dto.request.UserUpdateDTO;
 import com.tasktrakr.task.management.dto.response.AdminTaskResponseDTO;
-import com.tasktrakr.task.management.dto.response.TaskResponseDTO;
+import com.tasktrakr.task.management.dto.response.FilterResponseDTO;
 import com.tasktrakr.task.management.dto.response.UserResponseDTO;
 import com.tasktrakr.task.management.exception.InvalidUserStateException;
 import com.tasktrakr.task.management.exception.LastAdminException;
@@ -14,8 +16,11 @@ import com.tasktrakr.task.management.repository.TaskRepository;
 import com.tasktrakr.task.management.repository.UserRepository;
 import com.tasktrakr.task.management.service.AdminService;
 import com.tasktrakr.task.management.enums.Role;
-import com.tasktrakr.task.management.enums.TaskStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,13 +33,6 @@ public class AdminServiceImplementation implements AdminService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
 
-    @Override
-    public List<AdminTaskResponseDTO> getAllTasks() {
-        return taskRepository.findAll()
-                .stream()
-                .map(this::mapTaskToAdminResponseDTO)
-                .collect(Collectors.toList());
-    }
 
     @Override
     public AdminTaskResponseDTO getTaskById(Long taskId) {
@@ -44,18 +42,73 @@ public class AdminServiceImplementation implements AdminService {
     }
 
     @Override
-    public List<UserResponseDTO> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(this::mapUserToResponseDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public UserResponseDTO getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         return mapUserToResponseDTO(user);
+    }
+
+    @Override
+    public FilterResponseDTO<UserResponseDTO> searchUsers(UserSearchDTO searchDTO) {
+        Sort sort = searchDTO.getSortDir().equalsIgnoreCase("asc")
+                ? Sort.by(searchDTO.getSortBy()).ascending()
+                : Sort.by(searchDTO.getSortBy()).descending();
+
+        Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize(), sort);
+
+        Page<User> userPage = userRepository.searchUsers(
+                searchDTO.getName(),
+                searchDTO.getEmail(),
+                searchDTO.getRole(),
+                searchDTO.getActive(),
+                pageable
+        );
+
+        List<UserResponseDTO> content = userPage.getContent()
+                .stream()
+                .map(this::mapUserToResponseDTO)
+                .collect(Collectors.toList());
+
+        return new FilterResponseDTO<>(
+                content,
+                userPage.getNumber(),
+                userPage.getSize(),
+                userPage.getTotalElements(),
+                userPage.getTotalPages(),
+                userPage.isLast()
+        );
+    }
+
+    @Override
+    public FilterResponseDTO<AdminTaskResponseDTO> searchAllTasks(TaskSearchDTO searchDTO, Long userId) {
+        Sort sort = searchDTO.getSortDir().equalsIgnoreCase("asc")
+                ? Sort.by(searchDTO.getSortBy()).ascending()
+                : Sort.by(searchDTO.getSortBy()).descending();
+
+        Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize(), sort);
+
+        Page<Task> taskPage = taskRepository.searchTasksForAdmin(
+                userId,
+                searchDTO.getTitle(),
+                searchDTO.getStatus(),
+                searchDTO.getDeadlineFrom(),
+                searchDTO.getDeadlineTo(),
+                pageable
+        );
+
+        List<AdminTaskResponseDTO> content = taskPage.getContent()
+                .stream()
+                .map(this::mapTaskToAdminResponseDTO)
+                .collect(Collectors.toList());
+
+        return new FilterResponseDTO<>(
+                content,
+                taskPage.getNumber(),
+                taskPage.getSize(),
+                taskPage.getTotalElements(),
+                taskPage.getTotalPages(),
+                taskPage.isLast()
+        );
     }
 
     @Override
@@ -136,6 +189,7 @@ public class AdminServiceImplementation implements AdminService {
         response.setTaskId(task.getTaskId());
         response.setTitle(task.getTitle());
         response.setDescription(task.getDescription());
+        response.setDeadline(task.getDeadline());
         response.setStatus(task.getStatus());
         response.setUsername(task.getUser().getUsername());
         return response;

@@ -1,7 +1,10 @@
 package com.tasktrakr.task.management.service;
 
+import com.tasktrakr.task.management.dto.request.TaskSearchDTO;
+import com.tasktrakr.task.management.dto.request.UserSearchDTO;
 import com.tasktrakr.task.management.dto.request.UserUpdateDTO;
 import com.tasktrakr.task.management.dto.response.AdminTaskResponseDTO;
+import com.tasktrakr.task.management.dto.response.FilterResponseDTO;
 import com.tasktrakr.task.management.dto.response.UserResponseDTO;
 import com.tasktrakr.task.management.enums.Role;
 import com.tasktrakr.task.management.enums.TaskStatus;
@@ -22,6 +25,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 import java.util.List;
@@ -66,12 +71,25 @@ class AdminServiceTest {
 
     @Test
     void shouldReturnAllTasks() {
-        when(taskRepository.findAll()).thenReturn(List.of(task));
+        when(taskRepository.searchTasksForAdmin(
+                eq(null), // userId
+                isNull(), // title
+                isNull(), // status
+                isNull(), // deadlineFrom
+                isNull(), // deadlineTo
+                any(Pageable.class)
+        )).thenReturn(new PageImpl<>(List.of(task)));
 
-        List<AdminTaskResponseDTO> result = adminService.getAllTasks();
+        TaskSearchDTO searchDTO = new TaskSearchDTO();
+        searchDTO.setPage(0);
+        searchDTO.setSize(10);
+        searchDTO.setSortBy("createdAt");
+        searchDTO.setSortDir("desc");
 
-        assertEquals(1, result.size());
-        assertEquals("Test Task", result.get(0).getTitle());
+        FilterResponseDTO<AdminTaskResponseDTO> result = adminService.searchAllTasks(searchDTO, null); // null
+
+        assertEquals(1, result.getContent().size());
+        assertEquals("Test Task", result.getContent().get(0).getTitle());
     }
 
     @Test
@@ -96,12 +114,27 @@ class AdminServiceTest {
 
     @Test
     void shouldReturnAllUsers() {
-        when(userRepository.findAll()).thenReturn(List.of(user));
+        when(userRepository.searchUsers(
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                any(Pageable.class)
+        )).thenReturn(new PageImpl<>(List.of(user)));
 
-        List<UserResponseDTO> result = adminService.getAllUsers();
+        UserSearchDTO searchDTO = new UserSearchDTO();
+        searchDTO.setPage(0);
+        searchDTO.setSize(10);
+        searchDTO.setSortBy("createdAt");
+        searchDTO.setSortDir("desc");
 
-        assertEquals(1, result.size());
-        assertEquals("john", result.get(0).getUsername());
+        FilterResponseDTO<UserResponseDTO> result = adminService.searchUsers(searchDTO);
+
+        // Access the list inside FilterResponseDTO
+        List<UserResponseDTO> users = result.getContent();
+
+        assertEquals(1, users.size());
+        assertEquals("john", users.get(0).getUsername());
     }
 
     @Test

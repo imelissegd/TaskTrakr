@@ -17,10 +17,43 @@ let mockAdminTasks = [
 
 // ── Users ──────────────────────────────────────────────────────
 
-export const adminGetAllUsers = async () => {
-  if (MOCK) return [...mockUsers];
-  const res = await axiosInstance.get("/api/admin/users");
-  return res.data;
+export const adminGetAllUsers = async ({
+  page = 0,
+  size = 10,
+  name,
+  email,
+  role,
+  active,
+} = {}) => {
+  if (MOCK) {
+    // Client-side mock filtering/pagination
+    let filtered = [...mockUsers];
+
+    if (name) {
+      filtered = filtered.filter(u =>
+        `${u.firstname} ${u.middlename} ${u.lastname}`.toLowerCase().includes(name.toLowerCase())
+      );
+    }
+    if (email) filtered = filtered.filter(u => u.email.toLowerCase().includes(email.toLowerCase()));
+    if (role) filtered = filtered.filter(u => u.role === role);
+    if (active !== undefined) filtered = filtered.filter(u => u.active === active);
+
+    const start = page * size;
+    const end = start + size;
+    return {
+      content: filtered.slice(start, end),
+      page,
+      size,
+      totalElements: filtered.length,
+      totalPages: Math.ceil(filtered.length / size),
+      last: page >= Math.ceil(filtered.length / size) - 1,
+    };
+  }
+
+  // Backend call with query params
+  const params = { page, size, name, email, role, active };
+  const res = await axiosInstance.get("/api/admin/users", { params });
+  return res.data; // Should return FilterResponseDTO<UserResponseDTO>
 };
 
 export const adminGetUserById = async (userId) => {
@@ -77,9 +110,42 @@ export const adminReactivateUser = async (userId) => {
 
 // ── Tasks ──────────────────────────────────────────────────────
 
-export const adminGetAllTasks = async () => {
-  if (MOCK) return [...mockAdminTasks];
-  const res = await axiosInstance.get("/api/admin/tasks");
+export const adminGetAllTasks = async ({
+  page = 0,
+  size = 10,
+  title,
+  status,
+  userId,
+} = {}) => {
+  if (MOCK) {
+    let filtered = [...mockAdminTasks];
+
+    if (title) {
+      filtered = filtered.filter(t =>
+        t.title.toLowerCase().includes(title.toLowerCase())
+      );
+    }
+    if (status) {
+      filtered = filtered.filter(t => t.status === status);
+    }
+    if (userId) {
+      filtered = filtered.filter(t => t.userId === userId || t.username === mockUsers.find(u => u.userId === userId)?.username);
+    }
+
+    const start = page * size;
+    const end = start + size;
+
+    return {
+      content: filtered.slice(start, end),
+      page,
+      size,
+      totalElements: filtered.length,
+      totalPages: Math.ceil(filtered.length / size),
+      last: page >= Math.ceil(filtered.length / size) - 1,
+    };
+  }
+
+  const res = await axiosInstance.get("/api/admin/tasks", { params: { page, size, title, status, userId } });
   return res.data;
 };
 

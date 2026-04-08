@@ -20,19 +20,38 @@ export default function AdminUsersPage() {
   const [error, setError]     = useState("");
   const [actionId, setActionId] = useState(null);
 
-  useEffect(() => { fetchUsers(); }, []);
+  const [page, setPage] = useState(0);
+  const [pageSize] = useState(10); // or 10, whatever default
+  const [totalPages, setTotalPages] = useState(0);
+
+  const [searchName, setSearchName] = useState("");
+  const [filterRole, setFilterRole] = useState("");
+  const [filterActive, setFilterActive] = useState("");
 
   const fetchUsers = async () => {
-    setLoading(true);
     try {
-      const data = await adminGetAllUsers();
-      setUsers(data);
+      const data = await adminGetAllUsers({
+        page,
+        size: pageSize,
+        name: searchName || undefined,
+        role: filterRole || undefined,
+        active: filterActive === "" ? undefined : filterActive === "true",
+      });
+
+      setUsers(data.content);
+      setTotalPages(data.totalPages);
     } catch {
       setError("Failed to load users.");
-    } finally {
-      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [page, searchName, filterRole, filterActive]);
+
+useEffect(() => {
+  setPage(0); // reset to first page whenever search/filter changes
+}, [searchName, filterRole, filterActive]);
 
   const handlePromoteDemote = async (u) => {
     setActionId(u.userId);
@@ -75,15 +94,52 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
+      <div className="flex items-center gap-2 mb-4">
+        {/* Name Search */}
+        <input
+          type="text"
+          placeholder="Search by name..."
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
+          className="task-action-btn !px-3 !py-1 !text-sm !bg-white !border !border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        {/* Role Filter */}
+        <select
+          value={filterRole}
+          onChange={(e) => setFilterRole(e.target.value)}
+          className="task-action-btn !px-3 !py-1 !text-sm !bg-white !border !border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">All Roles</option>
+          <option value="Admin">Admin</option>
+          <option value="User">User</option>
+        </select>
+
+        {/* Active Status Filter */}
+        <select
+          value={filterActive}
+          onChange={(e) => setFilterActive(e.target.value)}
+          className="task-action-btn !px-3 !py-1 !text-sm !bg-white !border !border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">All Status</option>
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+        <button
+            className="task-action-btn task-action-btn--cancel"
+            onClick={() => {
+              setSearchName("");
+              setFilterRole("");
+              setFilterActive("");
+              setPage(0);
+            }}
+          >
+            Clear Filters
+          </button>
+      </div>
       {error && <div className="alert-error">{error}</div>}
 
-      {loading && (
-        <div className="tasks-empty">
-          <span className="tasks-empty-icon">⏳</span>
-          <p>Loading users…</p>
-        </div>
-      )}
-
+      {/* Show no users found only if users is empty and not loading */}
       {!loading && users.length === 0 && (
         <div className="tasks-empty">
           <span className="tasks-empty-icon">👥</span>
@@ -91,7 +147,7 @@ export default function AdminUsersPage() {
         </div>
       )}
 
-      {!loading && users.length > 0 && (
+      {users.length > 0 && (
         <div className="tasks-grid">
           {users.map((u) => {
             const busy      = actionId === u.userId;
@@ -169,6 +225,37 @@ export default function AdminUsersPage() {
         </div>
       )}
 
+{!loading && totalPages > 1 && (
+  <div className="flex items-center gap-2 mt-4 justify-center">
+
+    <button
+      className="task-action-btn"
+      disabled={page === 0}
+      onClick={() => setPage((p) => Math.max(p - 1, 0))}
+    >
+      Previous
+    </button>
+
+    {Array.from({ length: totalPages }, (_, i) => i).map((i) => (
+      <button
+        key={i}
+        className={`task-action-btn ${i === page ? "bg-blue-500 text-white" : ""}`}
+        onClick={() => setPage(i)}
+      >
+        {i + 1}
+      </button>
+    ))}
+
+    <button
+      className="task-action-btn"
+      disabled={page >= totalPages - 1}
+      onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))}
+    >
+      Next
+    </button>
+
+  </div>
+)}
     </div>
   );
 }

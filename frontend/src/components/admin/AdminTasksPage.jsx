@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { adminGetAllTasks } from "../../services/adminService";
+import { adminGetAllTasks, adminGetAllUsers } from "../../services/adminService";
 
 const STATUS_META = {
   Pending:   { label: "Pending",   css: "badge-tracking" },
@@ -15,19 +15,55 @@ export default function AdminTasksPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState("");
 
-  useEffect(() => {
-    const load = async () => {
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0); // Total task from backend
+
+  const [searchTitle, setSearchTitle] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterUserId, setFilterUserId] = useState(null);
+  const [users, setUsers] = useState([]);
+
+    const fetchTasks = async () => {
       try {
-        const data = await adminGetAllTasks();
-        setTasks(data);
+        const data = await adminGetAllTasks({
+          page,
+          size: pageSize,
+          title: searchTitle || undefined,
+          status: filterStatus || undefined,
+          userId: filterUserId || undefined,
+        });
+
+        setTasks(data.content);        // assume backend returns { content, totalPages }
+        setTotalPages(data.totalPages);
+        setTotalElements(data.totalElements);
       } catch {
         setError("Failed to load tasks.");
       } finally {
         setLoading(false);
       }
     };
-    load();
-  }, []);
+
+    useEffect(() => {
+      setPage(0); // reset to first page whenever filters/search change
+    }, [searchTitle, filterStatus, filterUserId]);
+
+    useEffect(() => {
+      fetchTasks();
+    }, [page, searchTitle, filterStatus, filterUserId]);
+
+    useEffect(() => {
+      const fetchUsers = async () => {
+        try {
+          const data = await adminGetAllUsers({ active: true, size: 100 }); // fetch active users
+          setUsers(data.content);
+        } catch (err) {
+          console.error("Failed to load users", err);
+        }
+      };
+      fetchUsers();
+    }, []);
 
   return (
     <div className="tasks-page">
@@ -35,25 +71,84 @@ export default function AdminTasksPage() {
       <div className="tasks-header">
         <div>
           <h1 className="page-header">All Tasks</h1>
-          <p className="page-subheader">{tasks.length} task{tasks.length !== 1 ? "s" : ""} across all users</p>
+          <p className="page-subheader">
+            {totalElements} task{totalElements !== 1 ? "s" : ""} across all users
+          </p>
         </div>
       </div>
 
+    <div className="flex items-center gap-2 mb-4">
+
+      {/* Title Search */}
+      <input
+        type="text"
+        placeholder="Search by title..."
+        value={searchTitle}
+        onChange={(e) => setSearchTitle(e.target.value)}
+        className="task-action-btn !px-3 !py-1 !text-sm !bg-white !border !border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+
+    {/* Owner Filter */}
+      <select
+        value={filterUserId ?? ""}
+        onChange={(e) => setFilterUserId(e.target.value ? Number(e.target.value) : null)}
+        className="task-action-btn !px-3 !py-1 !text-sm !bg-white !border !border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">All Users</option>
+        {users.map((user) => (
+          <option key={user.userId} value={user.userId}>
+            {user.firstname} {user.middlename} {user.lastname}
+          </option>
+        ))}
+      </select>
+
+      {/* Status Filter */}
+      <select
+        value={filterStatus}
+        onChange={(e) => setFilterStatus(e.target.value)}
+        className="task-action-btn !px-3 !py-1 !text-sm !bg-white !border !border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">All Status</option>
+        <option value="Pending">Pending</option>
+        <option value="Completed">Completed</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+
+      <button
+        className="task-action-btn task-action-btn--cancel"
+        onClick={() => {
+          setSearchTitle("");
+          setFilterStatus("");
+          setFilterUserId(null);
+          setPage(0);
+        }}
+      >
+        Clear Filters
+      </button>
+    </div>
+
       {error && <div className="alert-error">{error}</div>}
 
-      {loading && (
-        <div className="tasks-empty">
-          <span className="tasks-empty-icon">⏳</span>
-          <p>Loading tasks…</p>
-        </div>
-      )}
+    {loading && (
+      <div className="tasks-empty">
+        <span className="tasks-empty-icon">⏳</span>
+        <p>Loading tasks…</p>
+      </div>
+    )}
 
-      {!loading && tasks.length === 0 && (
-        <div className="tasks-empty">
-          <span className="tasks-empty-icon">📋</span>
-          <p className="tasks-empty-text">No tasks found.</p>
-        </div>
-      )}
+    {loading && tasks.length === 0 && (
+      <div className="tasks-empty">
+        <span className="tasks-empty-icon">⏳</span>
+        <p>Loading tasks…</p>
+      </div>
+    )}
+
+    {!loading && tasks.length === 0 && (
+      <div className="tasks-empty">
+        <span className="tasks-empty-icon">📋</span>
+        <p className="tasks-empty-text">No tasks found.</p>
+      </div>
+    )}
 
       {!loading && tasks.length > 0 && (
         <div className="tasks-grid">
@@ -117,6 +212,39 @@ export default function AdminTasksPage() {
             );
           })}
 
+        </div>
+      )}
+
+      {!loading && totalPages > 1 && (
+        <div className="flex items-center gap-2 mt-4 justify-center">
+          {/* Previous button */}
+          <button
+            className="task-action-btn"
+            disabled={page === 0}
+            onClick={() => setPage((p) => Math.max(p - 1, 0))}
+          >
+            Previous
+          </button>
+
+          {/* Page numbers */}
+          {Array.from({ length: totalPages }, (_, i) => i).map((i) => (
+            <button
+              key={i}
+              className={`task-action-btn ${i === page ? "bg-blue-500 text-white" : ""}`}
+              onClick={() => setPage(i)}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          {/* Next button */}
+          <button
+            className="task-action-btn"
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))}
+          >
+            Next
+          </button>
         </div>
       )}
 

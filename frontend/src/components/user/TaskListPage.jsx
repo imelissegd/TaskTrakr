@@ -40,13 +40,27 @@ export default function TaskListPage() {
   const [toDelete, setToDelete] = useState(null);
   const [actionId, setActionId] = useState(null);
 
-  useEffect(() => { fetchTasks(); }, []);
+  const [totalTasks, setTotalTasks] = useState(0);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const [searchTitle, setSearchTitle] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterDeadlineFrom, setFilterDeadlineFrom] = useState("");
+  const [filterDeadlineTo, setFilterDeadlineTo] = useState("");
 
   const fetchTasks = async () => {
-    setLoading(true);
     try {
-      const data = await getTasks();
-      setTasks(data);
+      const data = await getTasks({
+        page,
+        size: pageSize,
+        title: searchTitle,
+        status: filterStatus,
+      });
+      setTasks(data.content);
+      setTotalTasks(data.totalElements);
+      setTotalPages(data.totalPages);
     } catch {
       setError("Failed to load tasks.");
     } finally {
@@ -54,6 +68,7 @@ export default function TaskListPage() {
     }
   };
 
+useEffect(() => { fetchTasks(); }, [page, searchTitle, filterStatus, filterDeadlineFrom, filterDeadlineTo]);
   const handleStatusChange = async (task, newStatus) => {
     setActionId(task.taskId);
     try {
@@ -86,12 +101,51 @@ export default function TaskListPage() {
       <div className="tasks-header">
         <div>
           <h1 className="page-header">My Tasks</h1>
-          <p className="page-subheader">{tasks.length} task{tasks.length !== 1 ? "s" : ""} total</p>
+          <p className="page-subheader">
+            {totalTasks} task{totalTasks !== 1 ? "s" : ""} total
+          </p>
         </div>
         <Link to="/tasks/add" className="btn-primary tasks-add-btn">
           + Add Task
         </Link>
       </div>
+
+    <div className="flex flex-wrap items-center gap-2 mb-4">
+      {/* Title Search */}
+      <input
+        type="text"
+        placeholder="Search by title..."
+        value={searchTitle}
+        onChange={(e) => setSearchTitle(e.target.value)}
+        className="task-action-btn !px-3 !py-1 !text-sm !bg-white !border !border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+
+      {/* Status Filter */}
+      <select
+        value={filterStatus}
+        onChange={(e) => setFilterStatus(e.target.value)}
+        className="task-action-btn !px-3 !py-1 !text-sm !bg-white !border !border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">All Status</option>
+        <option value="Pending">Pending</option>
+        <option value="Completed">Completed</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+
+      {/* Clear Filters */}
+      <button
+        className="task-action-btn task-action-btn--cancel"
+        onClick={() => {
+          setSearchTitle("");
+          setFilterStatus("");
+          setFilterDeadlineFrom("");
+          setFilterDeadlineTo("");
+          setPage(0);
+        }}
+      >
+        Clear Filters
+      </button>
+    </div>
 
       {error && <div className="alert-error">{error}</div>}
 
@@ -207,6 +261,21 @@ export default function TaskListPage() {
         />
       )}
 
+        {totalPages > 1 && (
+          <div className="flex gap-2 mt-4">
+            <button disabled={page === 0} onClick={() => setPage(page - 1)}>Prev</button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                className={i === page ? "btn-active" : ""}
+                onClick={() => setPage(i)}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button disabled={page + 1 === totalPages} onClick={() => setPage(page + 1)}>Next</button>
+          </div>
+        )}
     </div>
   );
 }

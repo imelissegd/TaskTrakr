@@ -11,7 +11,7 @@ const STATUSES = [
 export default function AddTaskPage() {
   const navigate = useNavigate();
 
-  const [form, setForm]           = useState({ title: "", description: "", status: "Pending" });
+  const [form, setForm]           = useState({ title: "", description: "", status: "Pending", deadline: "" });
   const [error, setError]         = useState("");
   const [loading, setLoading]     = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -34,7 +34,10 @@ export default function AddTaskPage() {
 
     setLoading(true);
     try {
-      await createTask(form);
+      await createTask({
+        ...form,
+        deadline: form.deadline ? new Date(form.deadline).toISOString() : null
+      });
       navigate("/tasks");
     } catch {
       setError("Failed to create task. Please try again.");
@@ -93,6 +96,23 @@ export default function AddTaskPage() {
               rows={3}
               className="task-textarea"
             />
+          </div>
+
+          {/* Deadline */}
+          <div className="field-group">
+            <label htmlFor="deadline">Deadline</label>
+            <div className="input-wrap">
+              <span className="input-icon">&#128197;</span>
+              <input
+                id="deadline"
+                name="deadline"
+                type="datetime-local"
+                value={form.deadline}
+                onChange={handleChange}
+                min={new Date().toISOString().slice(0, 16)} // prevent past dates
+                className=""
+              />
+            </div>
           </div>
 
           {/* Status */}

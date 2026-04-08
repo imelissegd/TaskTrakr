@@ -8,12 +8,20 @@ let mockTasks = [
 ];
 let nextId = 4;
 
-export const getTasks = async () => {
-  if (MOCK) return [...mockTasks];
-  const res = await axiosInstance.get("/api/tasks");
+export const getTasks = async ({ page = 0, size = 10, title, status, deadlineFrom, deadlineTo } = {}) => {
+  if (MOCK) {
+    return {
+      content: [...mockTasks],
+      totalElements: mockTasks.length,
+      totalPages: 1,
+      number: 0,
+    };
+  }
+  const res = await axiosInstance.get("/api/tasks", {
+    params: { page, size, title, status, deadlineFrom, deadlineTo },
+  });
   return res.data;
 };
-
 export const getTaskById = async (id) => {
   if (MOCK) {
     const task = mockTasks.find((t) => t.taskId === Number(id));

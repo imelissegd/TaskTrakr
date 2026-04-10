@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -26,8 +26,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             @Param("userId") Long userId,
             @Param("title") String title,
             @Param("status") TaskStatus status,
-            @Param("deadlineFrom") LocalDateTime deadlineFrom,
-            @Param("deadlineTo") LocalDateTime deadlineTo,
+            @Param("deadlineFrom") LocalDate deadlineFrom,
+            @Param("deadlineTo") LocalDate deadlineTo,
             Pageable pageable
     );
 
@@ -41,8 +41,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             @Param("userId") Long userId,
             @Param("title") String title,
             @Param("status") TaskStatus status,
-            @Param("deadlineFrom") LocalDateTime deadlineFrom,
-            @Param("deadlineTo") LocalDateTime deadlineTo,
+            @Param("deadlineFrom") LocalDate deadlineFrom,
+            @Param("deadlineTo") LocalDate deadlineTo,
             Pageable pageable
     );
 }

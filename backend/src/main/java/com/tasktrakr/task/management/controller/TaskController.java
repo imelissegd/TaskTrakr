@@ -16,7 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -35,8 +35,8 @@ public class TaskController {
     public ResponseEntity<FilterResponseDTO<TaskResponseDTO>> getMyTasks(
             @AuthenticationPrincipal User user,
             @RequestParam(required = false) String title,
-            @RequestParam(required = false) LocalDateTime deadlineFrom,
-            @RequestParam(required = false) LocalDateTime deadlineTo,
+            @RequestParam(required = false) LocalDate deadlineFrom,
+            @RequestParam(required = false) LocalDate deadlineTo,
             @RequestParam(required = false) TaskStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

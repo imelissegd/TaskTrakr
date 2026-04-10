@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -15,6 +15,6 @@ public class TaskResponseDTO {
     private Long taskId;
     private String title;
     private String description;
-    private LocalDateTime deadline;
+    private LocalDate deadline;
     private TaskStatus status;
 }

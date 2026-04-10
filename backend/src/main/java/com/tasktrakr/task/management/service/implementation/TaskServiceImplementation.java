@@ -19,7 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -85,7 +85,7 @@ public class TaskServiceImplementation implements TaskService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        if (taskRequestDTO.getDeadline() != null && taskRequestDTO.getDeadline().isBefore(LocalDateTime.now())) {
+        if (taskRequestDTO.getDeadline() != null && taskRequestDTO.getDeadline().isBefore(LocalDate.now())) {
             throw new InvalidDeadlineException();
         }
 
@@ -114,7 +114,7 @@ public class TaskServiceImplementation implements TaskService {
             task.setDescription(taskUpdateDTO.getDescription());
         }
         if (taskUpdateDTO.getDeadline() != null) {
-            if (taskUpdateDTO.getDeadline().isBefore(LocalDateTime.now())) {
+            if (taskUpdateDTO.getDeadline().isBefore(LocalDate.now())) {
                 throw new InvalidDeadlineException();
             }
             task.setDeadline(taskUpdateDTO.getDeadline());

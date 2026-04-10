@@ -1,2 +1,2 @@
 ALTER TABLE tasks
-    ADD COLUMN deadline DATETIME;
+    ADD COLUMN deadline DATE;

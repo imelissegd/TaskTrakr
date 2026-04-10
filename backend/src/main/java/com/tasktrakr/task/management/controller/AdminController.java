@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -33,8 +33,8 @@ public class AdminController {
     public ResponseEntity<FilterResponseDTO<AdminTaskResponseDTO>> getAllTasks(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String title,
-            @RequestParam(required = false) LocalDateTime deadlineFrom,
-            @RequestParam(required = false) LocalDateTime deadlineTo,
+            @RequestParam(required = false) LocalDate deadlineFrom,
+            @RequestParam(required = false) LocalDate deadlineTo,
             @RequestParam(required = false) TaskStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
